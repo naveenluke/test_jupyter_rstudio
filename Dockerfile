@@ -29,6 +29,8 @@ RUN pip install git+https://github.com/jupyterhub/jupyter-rsession-proxy
 ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
 ENV LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server:/opt/conda/lib/R/lib"
 
+USER root
+
 # install CRAN packages
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     r-cran-devtools \
@@ -110,8 +112,9 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     r-cran-mvoutlier \
     r-cran-penalized \
     r-cran-mgcv \
-    r-cran-corrplot
-
+    r-cran-corrplot \
+    ;
+    
 # Install other CRAN
 RUN Rscript -e 'install.packages(c("circlize"))'
 
@@ -119,6 +122,7 @@ RUN Rscript -e 'install.packages(c("circlize"))'
 RUN Rscript -e 'BiocManager::install(c("ELMER", "MultiAssayExperiment", "TxDb.Hsapiens.UCSC.hg38.knownGene","karyoploteR", "ComplexHeatmap", "TCGAbiolinks"  "SummarizedExperiment", "GenomicRanges"))'
 
 # MAKE DEFAULT USER SUDO
+USER $NB_USER
 
 # give jovyan sudo permissions
 RUN sed -i -e "s/Defaults    requiretty.*/ #Defaults    requiretty/g" /etc/sudoers
